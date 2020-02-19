@@ -12,7 +12,7 @@ class UserController {
     }
     getValues() {
         let user = {};    
-        this.formEl.elements.forEach(function (filed, index) {
+        [this.formEl.elements].forEach(function (filed, index) {
             if (filed.name == "gender") {
                 if (filed.checked) {
                     user[filed.name] = filed.value
