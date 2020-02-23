@@ -8,27 +8,39 @@ class UserController {
         this.formEl.addEventListener('submit', event => {
             event.preventDefault();
             let values = this.getValues();
-            this.getPhoto((content) => {
+            this.getPhoto().then(content => {
                 values.photo = content;
                 this.addLine(values);
+            },
+            (e) => {
+                console.error(e);
             });
-            
         });
     }// close metody onSubmit
      // pegar foto
-     getPhoto(callback){
-        let fileReader = new FileReader();
-        let elements = [...this.formEl.elements].filter(item => {
-            if(item.name === "photo"){
-                return item;
+     getPhoto(){
+         return new Promise((resolve,reject)=> {
+            let fileReader = new FileReader();
+            let elements = [...this.formEl.elements].filter(item => {
+                if(item.name === "photo"){
+                    return item;
+                }
+            });
+            let file = elements[0].files[0];
+            
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = (e) => {
+                reject(e);
             }
-        });
-        let file = elements[0].files[0];
+            if(file){
+                fileReader.readAsDataURL(file);
+            }else {
+                resolve('dist/img/boxed-bg.jpg')
+            }
+         });
         
-        fileReader.onload = () => {
-            callback(fileReader.result);
-        };
-        fileReader.readAsDataURL(file);
     }
     getValues() {
         let user = {};    
@@ -37,7 +49,9 @@ class UserController {
                 if (filed.checked) {
                     user[filed.name] = filed.value
                 };
-            } else {
+            } else if(filed.name == "admin"){
+                user[filed.name] = filed.checked
+            }else{
                 user[filed.name] = filed.value
             };
         });
@@ -52,18 +66,18 @@ class UserController {
             user.admin);
     }// close metody getValues
     addLine(dataUser) {
-        this.tableEl.innerHTML = ` 
-        <tr>
+        let tr = document.createElement('tr')
+        tr.innerHTML = ` 
             <td><img src="${dataUser.photo}" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
-            <td>${dataUser.admin}</td>
+            <td>${(dataUser.admin) ? 'Sim' : 'Não'}</td>
             <td>${dataUser.birth}</td>
             <td>
             <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
             <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
             </td>
-        </tr>
         `;
+        this.tableEl.appendChild(tr);
     }
 }
