@@ -47,8 +47,13 @@ class UserController {
         
     }
     getValues() {
-        let user = {};    
+        let user = {}; 
+        let isValid = true;
         [...this.formEl.elements].forEach(function (filed, index) {
+            if(['name','email','password'].indexOf(filed.name) > -1 && !filed.value )  {
+                filed.parentElement.classList.add('has-error')
+                isValid =  false;
+            } 
             if (filed.name == "gender") {
                 if (filed.checked) {
                     user[filed.name] = filed.value
@@ -59,6 +64,9 @@ class UserController {
                 user[filed.name] = filed.value
             };
         });
+        if(!isValid){
+            return false;
+        }
         return new User(
             user.name,
             user.gender,
