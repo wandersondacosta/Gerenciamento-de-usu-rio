@@ -119,15 +119,9 @@ class UserController {
             user.admin
         );
     }// close metody getValues
-    getUsersStoge(){
-        let users = [];
-        if (localStorage.getItem("users")) {
-            users = JSON.parse(localStorage.getItem("users"));
-        }
-        return users;
-    }
+    
     selectAll() {
-        let users = this.getUsersStoge();
+        let users = User.getUsersStoge();
         users.forEach(dataUsers => {
             let user = new User();
             user.loadFromJSON(dataUsers)
@@ -160,6 +154,9 @@ class UserController {
     addEventsTr(tr) {
         tr.querySelector(".btn-delete").addEventListener('click', e => {
             if (confirm("Deseja realmente excluir?")) {
+                let user = new User();
+                user.loadFromJSON(JSON.parse(tr.dataset.user));
+                user.remove();
                 tr.remove();
                 this.updateCount();
             }
